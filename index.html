@@ -481,7 +481,7 @@ function Drawer({it,onClose}){
  </div>;
 }
 
-const VIEWS=[["grid","Grid","grid"],["kanban","Kanban","kan"],["calendar","Calendar","cal"],["timeline","Timeline","tl"],["form","Form","form"],["dashboard","Dashboard","chart"]];
+const VIEWS=[["grid","Grid","grid"],["kanban","Kanban","kan"],["timeline","Timeline","tl"],["form","Form","form"],["dashboard","Dashboard","chart"]];
 function App(){
  const h=location.hash.slice(1).split("-");
  const [view,setView]=useState(VIEWS.some(v=>v[0]===h[0])?h[0]:"grid");
@@ -508,7 +508,6 @@ function App(){
    <div className="body">
     {view==="grid"&&<Grid items={items} setItems={setItems} onOpen={openItem}/>}
     {view==="kanban"&&<Kanban items={items} setItems={setItems} onOpen={openItem}/>}
-    {view==="calendar"&&<Calendar items={items} onOpen={openItem}/>}
     {view==="timeline"&&<Timeline items={items} onOpen={openItem}/>}
     {view==="form"&&<Form/>}
     {view==="dashboard"&&<Dashboard items={items}/>}
