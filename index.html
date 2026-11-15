@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Boards · hiublue</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
+<style>
+:root{
+  --bg:#111111;--rail:#111111;--surface:#161616;--surface2:#1b1b1b;--popover:#202020;--input:#262626;--hover:#242424;
+  --bsub:#1f1f1f;--border:#2c2c2c;--bstrong:#414141;
+  --fg:#e6e6e6;--muted:#828282;--dis:#454545;
+  --accent:#5b78ff;--accentm:rgba(91,120,255,.14);--accentt:#8a9dff;--btn:#3550e8;--btnh:#4561f5;
+  --green:#22c55e;--yellow:#eab308;--orange:#f97316;--red:#ef4444;--purple:#a855f7;--blue:#5b78ff;--grey:#525252;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:13px/1.45 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+input,textarea,select{font:inherit;color:var(--fg)}
+.app{display:flex;height:100vh;overflow:hidden}
+/* sidebar */
+.side{width:232px;flex:none;background:var(--rail);border-right:1px solid var(--bsub);display:flex;flex-direction:column;padding:14px 10px}
+.logo{display:flex;align-items:center;gap:8px;padding:2px 6px 14px}
+.logo b{font-size:19px;letter-spacing:-.3px;color:#2945F2;font-weight:700}
+.ws{display:flex;align-items:center;gap:8px;padding:7px 8px;border:1px solid var(--border);border-radius:8px;margin-bottom:12px;background:var(--surface)}
+.ws .sq{width:22px;height:22px;border-radius:6px;background:#3a2a12;color:#f5b041;display:grid;place-items:center;font-weight:700;font-size:11px}
+.nav{flex:1;overflow:auto}
+.ni{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:6px;color:#bdbdbd;font-weight:500;margin-bottom:1px}
+.ni:hover{background:var(--hover)}
+.ni svg{color:var(--muted)}
+.ni.on{background:var(--accentm);color:#fff}
+.ni.on svg{color:var(--accentt)}
+.new{margin-left:auto;font-size:10px;font-weight:600;color:var(--accentt);border:1px solid rgba(91,120,255,.4);border-radius:4px;padding:0 5px}
+.sub{padding-left:34px;color:var(--muted);font-size:12.5px;padding-top:4px;padding-bottom:4px;border-radius:6px;display:flex;align-items:center;gap:7px}
+.sub:hover{background:var(--hover)}
+.sub.on{color:var(--fg)}
+.sub i{width:7px;height:7px;border-radius:2px;display:inline-block}
+.me{display:flex;align-items:center;gap:9px;padding:8px;border-top:1px solid var(--bsub);margin-top:8px}
+/* main */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.head{padding:14px 24px 0;border-bottom:1px solid var(--bsub)}
+.crumb{color:var(--muted);font-size:12px}
+.titlerow{display:flex;align-items:flex-start;gap:12px;margin-top:6px}
+h1{font-size:20px;font-weight:600;margin:0;letter-spacing:-.2px;display:flex;align-items:center;gap:8px}
+.desc{color:var(--muted);margin-top:2px}
+.sp{flex:1}
+.btn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:6px;border:1px solid var(--border);background:var(--surface);font-weight:500;white-space:nowrap}
+.btn:hover{background:var(--hover)}
+.btn.pri{background:var(--btn);border-color:var(--btn);color:#fff}
+.btn.pri:hover{background:var(--btnh)}
+.btn.ghost{border-color:transparent;background:transparent;color:#bdbdbd}
+.btn.ghost:hover{background:var(--hover)}
+.btn.ai{border-color:rgba(91,120,255,.45);color:var(--accentt);background:var(--accentm)}
+.avs{display:flex}
+.av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:9.5px;font-weight:600;color:#fff;border:2px solid var(--bg);position:relative;flex:none}
+.avs .av+.av{margin-left:-7px}
+.av.sm{width:22px;height:22px;font-size:9.5px;border-width:0}
+.av .spk{position:absolute;right:-3px;bottom:-3px;width:11px;height:11px;border-radius:50%;background:var(--bg);display:grid;place-items:center}
+.tabs{display:flex;align-items:center;gap:2px;margin-top:14px}
+.tab{display:flex;align-items:center;gap:6px;padding:8px 10px 10px;color:var(--muted);font-weight:500;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab:hover{color:var(--fg)}
+.tab.on{color:var(--fg);border-bottom-color:var(--accent)}
+.tools{display:flex;align-items:center;gap:6px;padding:10px 24px;border-bottom:1px solid var(--bsub)}
+.search{display:flex;align-items:center;gap:7px;height:30px;padding:0 10px;border-radius:6px;background:var(--input);border:1px solid var(--border);width:220px;color:var(--muted)}
+.body{flex:1;overflow:auto;position:relative}
+/* grid */
+.grid{padding:16px 24px 40px;min-width:1000px}
+.group{margin-bottom:22px}
+.ghead{display:flex;align-items:center;gap:8px;padding:4px 0 8px;font-weight:600;font-size:14px}
+.ghead .cnt{color:var(--muted);font-weight:400;font-size:12px}
+table{border-collapse:separate;border-spacing:0;width:100%;table-layout:fixed}
+th{font-weight:500;color:var(--muted);text-align:left;font-size:12px;padding:0 10px;height:34px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);border-right:1px solid var(--bsub);background:var(--surface);white-space:nowrap;overflow:hidden}
+th .ti{display:inline-flex;align-items:center;gap:6px}
+td{height:38px;padding:0 10px;border-bottom:1px solid var(--bsub);border-right:1px solid var(--bsub);background:var(--surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+tr.r:hover td{background:#1c1c1c}
+td.strip,th.strip{width:6px;padding:0;border-right:0}
+td.st{padding:0;position:relative}
+.pill{display:flex;align-items:center;justify-content:center;height:100%;color:#fff;font-weight:500;font-size:12.5px;cursor:pointer}
+.pill:hover{filter:brightness(1.1)}
+.cb{width:14px;height:14px;border:1px solid var(--bstrong);border-radius:4px;display:inline-block;vertical-align:middle}
+.co{display:flex;align-items:center;gap:8px;font-weight:500;cursor:pointer}
+.co .ci{width:20px;height:20px;border-radius:5px;display:grid;place-items:center;font-size:10px;font-weight:700;color:#fff;flex:none}
+.tag{display:inline-flex;align-items:center;height:21px;padding:0 8px;border-radius:11px;font-size:11.5px;font-weight:500;border:1px solid var(--border);background:#1e1e1e;color:#cfcfcf}
+.bar{display:flex;align-items:center;gap:8px}
+.bar .tr{flex:1;height:6px;border-radius:3px;background:#262626;overflow:hidden}
+.bar .tr i{display:block;height:100%;border-radius:3px}
+.bar span{font-family:'JetBrains Mono',monospace;font-size:12px;width:22px;text-align:right}
+.mut{color:var(--muted)}
+.wk{display:flex;align-items:center;gap:7px}
+.add td{color:var(--muted);background:transparent;border-bottom:1px solid var(--bsub)}
+.foot td{background:transparent;border:0;height:34px}
+.dist{display:flex;height:22px;border-radius:4px;overflow:hidden;margin:0 2px}
+.pop{position:absolute;z-index:30;background:var(--popover);border:1px solid var(--bstrong);border-radius:8px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.5);width:180px;display:grid;gap:4px}
+.pop .pill{height:28px;border-radius:4px}
+/* kanban */
+.kan{display:flex;gap:10px;padding:16px 24px;align-items:flex-start;min-width:max-content}
+.col{width:196px;flex:none;background:#141414;border:1px solid var(--bsub);border-radius:8px;padding:8px}
+.col.over{border-color:var(--accent);background:#161a2a}
+.colh{display:flex;align-items:center;gap:8px;padding:4px 4px 10px;font-weight:600}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.card{background:var(--popover);border:1px solid var(--border);border-radius:8px;padding:10px 11px;margin-bottom:8px;cursor:grab}
+.card:hover{border-color:var(--bstrong)}
+.card .row{display:flex;align-items:center;gap:6px;margin-top:8px}
+/* calendar */
+.cal{padding:16px 24px}
+.calh{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.calh h2{font-size:16px;margin:0;font-weight:600}
+.seg{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.seg button{padding:5px 12px;color:var(--muted)}
+.seg button.on{background:var(--hover);color:var(--fg)}
+.month{display:grid;grid-template-columns:repeat(7,1fr);border-top:1px solid var(--border);border-left:1px solid var(--border);border-radius:8px;overflow:hidden}
+.dow{padding:8px 10px;color:var(--muted);font-size:12px;background:var(--surface);border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+.day{min-height:112px;padding:6px 6px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface)}
+.day.out{background:#131313;color:var(--dis)}
+.dn{font-size:12px;margin:0 0 4px 4px;width:22px;height:22px;display:grid;place-items:center;border-radius:50%}
+.today .dn{background:var(--accent);color:#fff;font-weight:600}
+.chip{display:flex;align-items:center;gap:6px;font-size:11.5px;padding:3px 6px;border-radius:4px;margin-bottom:3px;background:#202020;border-left:3px solid;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+/* timeline */
+.tl{padding:16px 24px;min-width:1000px}
+.tlg{display:grid;grid-template-columns:220px 1fr;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--surface)}
+.tln{padding:0 12px;height:36px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--bsub);border-right:1px solid var(--border)}
+.tlr{position:relative;height:36px;border-bottom:1px solid var(--bsub)}
+.tlb{position:absolute;top:8px;height:20px;border-radius:5px;color:#fff;font-size:11.5px;font-weight:500;padding:0 8px;display:flex;align-items:center;white-space:nowrap;overflow:hidden}
+/* form */
+.form{max-width:620px;margin:28px auto;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.form .fh{padding:22px 26px;border-bottom:1px solid var(--border);background:linear-gradient(0deg,#161616,#161a2a)}
+.fl{display:block;font-weight:500;margin:0 0 6px}
+.fi{width:100%;height:36px;border-radius:6px;background:var(--input);border:1px solid var(--border);padding:0 10px;color:var(--fg)}
+.toggle{width:32px;height:18px;border-radius:9px;background:var(--accent);position:relative;display:inline-block}
+.toggle:after{content:"";position:absolute;right:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#fff}
+/* dashboard */
+.dash{padding:16px 24px 40px;display:grid;grid-template-columns:repeat(12,1fr);gap:12px;min-width:1000px}
+.w{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.w h3{margin:0 0 10px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.w h3 .mut{font-weight:400;font-size:12px}
+.num{font-size:28px;font-weight:600;letter-spacing:-.5px}
+.delta{font-size:12px;color:var(--green)}
+/* panels */
+.panel{position:absolute;top:0;right:0;bottom:0;width:380px;background:var(--surface);border-left:1px solid var(--border);z-index:40;display:flex;flex-direction:column;box-shadow:-20px 0 40px rgba(0,0,0,.35)}
+.ph{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border)}
+.pb{flex:1;overflow:auto;padding:16px}
+.msgu{background:#262626;border-radius:12px;padding:10px 12px;margin-left:36px;margin-bottom:16px}
+.step{display:flex;align-items:center;gap:9px;padding:6px 0;border-bottom:1px solid var(--bsub)}
+.ok{width:16px;height:16px;border-radius:50%;background:rgba(34,197,94,.15);color:var(--green);display:grid;place-items:center;flex:none}
+.composer{margin:12px 16px 16px;border:1px solid var(--border);border-radius:12px;background:#232323;padding:10px 12px;color:var(--muted);display:flex;align-items:flex-end;gap:8px;min-height:68px}
+.kv{display:grid;grid-template-columns:120px 1fr;row-gap:12px;align-items:center}
+.kv .k{color:var(--muted)}
+.upd{border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:10px;background:#1b1b1b}
+.x{color:var(--muted);width:28px;height:28px;border-radius:6px;display:grid;place-items:center}
+.x:hover{background:var(--hover)}
+@media (max-width:1500px){html{zoom:.85}.app{height:117.65vh}}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:#111}::-webkit-scrollbar-thumb{background:#2c2c2c;border-radius:5px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const {useState,useEffect,useRef}=React;
+
+const ST={
+  "Lead":"#525252","Contacted":"#5b78ff","Meeting set":"#a855f7","Proposal sent":"#d4a20a","Won":"#22c55e","Lost":"#ef4444"
+};
+const STATUSES=Object.keys(ST);
+const WORKERS={Ashley:"#c2410c",Yoli:"#0f766e",Marco:"#7c3aed"};
+const TRADE_C={Painting:"#f97316",HVAC:"#06b6d4",Roofing:"#ef4444",Plumbing:"#3b82f6",Landscaping:"#22c55e",Electrical:"#eab308","Pest control":"#a855f7"};
+const GROUPS=[{id:"hot",name:"Hot this week",c:"#f97316"},{id:"nur",name:"Nurturing",c:"#5b78ff"},{id:"clo",name:"Closed",c:"#22c55e"}];
+
+const SEED=[
+ ["Bayou City Roofing","Roofing","Marcus Hill","Meeting set",92,"$5M to $10M",18,"Discovery call","Ashley","hot",1.4],
+ ["Gulf Coast Comfort HVAC","HVAC","Dana Price","Proposal sent",88,"$3M to $5M",17,"Review proposal","Yoli","hot",0.9],
+ ["Sugar Land Painters","Painting","Luis Ortega","Contacted",81,"$1M to $3M",16,"Call back","Ashley","hot",0.4],
+ ["Pearland Roof Masters","Roofing","Kevin Brooks","Meeting set",79,"$5M to $10M",19,"Site visit","Marco","hot",0.8],
+ ["Cypress Air Pros","HVAC","Tara Nguyen","Contacted",74,"$3M to $5M",20,"Send case study","Yoli","hot",0.5],
+ ["Galleria Painting Group","Painting","Angela Ruiz","Proposal sent",72,"$3M to $5M",23,"Follow up on pricing","Ashley","hot",0.6],
+ ["Lone Star Plumbing Co","Plumbing","Ray Castillo","Contacted",64,"$1M to $3M",24,"Second touch","Marco","nur",0.3],
+ ["Katy Green Landscaping","Landscaping","Jenna Moss","Lead",58,"$1M to $3M",25,"Intro text","Ashley","nur",0.2],
+ ["Heights Electric","Electrical","Omar Patel","Lead",55,"$3M to $5M",30,"Find owner cell","Yoli","nur",0.3],
+ ["Clear Lake Pest Pros","Pest control","Brian Lee","Contacted",51,"$1M to $3M",11,"Voicemail drop","Marco","nur",0.2],
+ ["Spring Branch Electric","Electrical","Sofia Garza","Lead",47,"$1M to $3M",9,"Intro email","Ashley","nur",0.2],
+ ["Magnolia Lawn Works","Landscaping","Carl Jensen","Lead",42,"$1M to $3M",27,"Wait for spring","Yoli","nur",0.1],
+ ["Humble Heating and Air","HVAC","Pat Wilson","Lead",38,"$3M to $5M",12,"LinkedIn connect","Marco","nur",0.2],
+ ["Memorial Home Services","Plumbing","Erin Shaw","Won",95,"$10M+",5,"Kickoff done","Ashley","clo",1.9],
+ ["Kingwood Exteriors","Painting","Hector Vega","Won",90,"$5M to $10M",10,"Onboarding","Yoli","clo",1.1],
+ ["Bellaire Plumbing","Plumbing","Nina Ford","Lost",33,"$1M to $3M",6,"Revisit in Q1","Marco","clo",0],
+];
+let ITEMS0=SEED.map((r,i)=>({id:i+1,company:r[0],trade:r[1],owner:r[2],status:r[3],intent:r[4],rev:r[5],day:r[6],next:r[7],worker:r[8],group:r[9],value:r[10]}));
+
+const COCOL=["#7c3aed","#0e7490","#b45309","#be123c","#15803d","#1d4ed8","#a21caf","#4d7c0f"];
+const initials=s=>s.split(" ").map(w=>w[0]).join("").slice(0,2);
+
+/* icons (lucide style) */
+const I=({d,s=16,c})=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c||"currentColor"} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{__html:d}}/>;
+const P={
+ home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+ building:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1"/>',
+ chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',
+ users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/>',
+ cal:'<rect x="3" y="4.5" width="18" height="16.5" rx="2"/><path d="M3 9.5h18M8 3v3M16 3v3"/>',
+ dollar:'<path d="M12 2v20M17 6.5c0-1.9-2.2-3-5-3s-5 1.3-5 3.5 2.2 3 5 3.5 5 1.4 5 3.6-2.2 3.4-5 3.4-5-1.1-5-3"/>',
+ contact:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+ doc:'<path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+ flow:'<rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="15" width="6" height="6" rx="1"/><path d="M6 9v4a2 2 0 0 0 2 2h7"/>',
+ target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+ board:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12M15 9v12"/>',
+ wrench:'<path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-8 8-3-3 8-8z"/><path d="M3 21l6-6"/>',
+ send:'<path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/>',
+ heart:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/>',
+ code:'<path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/>',
+ star:'<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/>',
+ spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
+ grid:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/>',
+ kan:'<rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="12" rx="1"/><rect x="17" y="3" width="4" height="8" rx="1"/>',
+ tl:'<path d="M4 6h10M8 12h12M4 18h8"/>',
+ form:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+ chart:'<path d="M3 3v18h18"/><path d="M7 15v-4M12 15V7M17 15v-7"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+ filter:'<path d="M3 5h18M6 12h12M10 19h4"/>',
+ sort:'<path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"/>',
+ layers:'<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
+ eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+ x:'<path d="M18 6 6 18M6 6l12 12"/>',
+ chev:'<path d="m6 9 6 6 6-6"/>',
+ chevr:'<path d="m9 6 6 6-6 6"/>',
+ chevl:'<path d="m15 6-6 6 6 6"/>',
+ check:'<path d="M20 6 9 17l-5-5"/>',
+ text:'<path d="M4 7V5h16v2M12 5v14M9 19h6"/>',
+ tag:'<path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
+ person:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+ status:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ hash:'<path d="M5 9h14M5 15h14M10 3 8 21M16 3l-2 18"/>',
+ bot:'<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 4v4M9 13v1M15 13v1"/>',
+ link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+ share:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>',
+ more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+ arrowup:'<path d="M12 19V5M5 12l7-7 7 7"/>',
+ undo:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+};
+
+const Logo=()=>(<svg width="20" height="22" viewBox="0 0 20 22"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#facc15"/><stop offset="1" stopColor="#f97316"/></linearGradient></defs><path d="M2 1h4l3 7v13H5L2 13z" fill="url(#lg)"/><path d="M10 11l7-3v10l-3 3h-4z" fill="#2945F2"/></svg>);
+
+const Av=({name,sm,ai})=>{const c=WORKERS[name]||"#3f3f46";return <span className={"av"+(sm?" sm":"")} style={{background:c}} title={name}>{initials(name)}{ai&&<span className="spk"><I d={P.spark} s={9} c="#8a9dff"/></span>}</span>};
+
+function Sidebar(){
+ const items=[["Today","home"],["Company","building"],["Chat","chat"],["Workers","users"],["Calendar","cal"],["Finance","dollar"],["Contacts","contact"],["Documents","doc"],["Workflows","flow"],["Opportunities","target"],["Boards","board"],["Operations","wrench"],["Outreach","send"],["Social","heart"],["Builds","code"]];
+ return <aside className="side">
+  <div className="logo"><Logo/><b>hiublue</b></div>
+  <div className="ws"><span className="sq">R</span><span style={{fontWeight:500,flex:1}}>R Oliver Painting</span><I d={P.chev} s={14} c="#828282"/></div>
+  <nav className="nav">
+   {items.map(([n,ic])=><React.Fragment key={n}>
+    <a className={"ni"+(n==="Boards"?" on":"")}><I d={P[ic]}/>{n}{n==="Boards"&&<span className="new">New</span>}</a>
+    {n==="Boards"&&<div style={{margin:"2px 0 6px"}}>
+      <div className="sub on"><i style={{background:"#f97316"}}/>Blue Collar Prospects</div>
+      <div className="sub"><i style={{background:"#22c55e"}}/>Crew Schedule</div>
+      <div className="sub"><i style={{background:"#a855f7"}}/>Q4 Content Plan</div>
+    </div>}
+   </React.Fragment>)}
+  </nav>
+  <div className="me"><span className="av" style={{background:"#334155",border:0}}>RO</span><div><div style={{fontWeight:500}}>Ralph Oliver</div><div className="mut" style={{fontSize:11.5}}>Owner</div></div></div>
+ </aside>;
+}
+
+const Bar=({v})=>{const c=v>=80?"#22c55e":v>=60?"#5b78ff":v>=45?"#eab308":"#ef4444";return <div className="bar"><div className="tr"><i style={{width:v+"%",background:c}}/></div><span>{v}</span></div>};
+const Co=({it,onOpen})=><div className="co" onClick={()=>onOpen&&onOpen(it)}><span className="ci" style={{background:COCOL[it.id%COCOL.length]}}>{it.company[0]}</span><span style={{overflow:"hidden",textOverflow:"ellipsis"}}>{it.company}</span></div>;
+const Trade=({t})=><span className="tag"><span className="dot" style={{background:TRADE_C[t],width:6,height:6,marginRight:6}}/>{t}</span>;
+const nd=d=>(d>=1&&d<=30?"Nov "+d:"Dec "+(d-30));
+
+function Grid({items,setItems,onOpen}){
+ const [pop,setPop]=useState(null);
+ const [closed,setClosed]=useState({});
+ const cols=[["Company","text",222],["Trade","tag",132],["Owner","person",136],["Status","status",128],["Intent score","hash",128],["Revenue band","tag",122],["Next step","cal",212],["Assigned worker","bot",140]];
+ useEffect(()=>{const f=()=>setPop(null);window.addEventListener("click",f);return()=>window.removeEventListener("click",f)},[]);
+ return <div className="grid">
+  {GROUPS.map(g=>{const rows=items.filter(i=>i.group===g.id);const avg=Math.round(rows.reduce((a,b)=>a+b.intent,0)/rows.length);
+   return <div className="group" key={g.id}>
+    <div className="ghead" style={{color:g.c,cursor:"pointer"}} onClick={()=>setClosed({...closed,[g.id]:!closed[g.id]})}>
+      <span style={{transform:closed[g.id]?"rotate(-90deg)":"none",display:"inline-flex"}}><I d={P.chev} s={15}/></span>{g.name}<span className="cnt">{rows.length} items</span></div>
+    {!closed[g.id]&&<table>
+     <colgroup><col style={{width:6}}/>{cols.map(c=><col key={c[0]} style={{width:c[2]}}/>)}</colgroup>
+     <thead><tr><th className="strip" style={{background:g.c,borderTopLeftRadius:8}}/>
+      {cols.map(c=><th key={c[0]} style={c[0]==="Status"?{textAlign:"center"}:null}><span className="ti"><I d={P[c[1]]} s={13}/>{c[0]}</span></th>)}</tr></thead>
+     <tbody>
+      {rows.map(it=><tr className="r" key={it.id}>
+       <td className="strip" style={{background:g.c}}/>
+       <td><Co it={it} onOpen={onOpen}/></td>
+       <td><Trade t={it.trade}/></td>
+       <td><div className="wk"><span className="av sm" style={{background:"#3f3f46"}}>{initials(it.owner)}</span>{it.owner}</div></td>
+       <td className="st" onClick={e=>{e.stopPropagation();setPop(pop===it.id?null:it.id)}}>
+         <div className="pill" style={{background:ST[it.status]}}>{it.status}</div>
+         {pop===it.id&&<div className="pop" style={{top:40,left:-20}} onClick={e=>e.stopPropagation()}>
+           {STATUSES.map(s=><div key={s} className="pill" style={{background:ST[s]}} onClick={()=>{setItems(items.map(x=>x.id===it.id?{...x,status:s}:x));setPop(null)}}>{s}</div>)}
+         </div>}
+       </td>
+       <td><Bar v={it.intent}/></td>
+       <td className="mut" style={{color:"#cfcfcf"}}>{it.rev}</td>
+       <td><span style={{color:it.day===15?"#8a9dff":it.day<15?"#ef4444":"#cfcfcf",fontWeight:500,marginRight:8}}>{nd(it.day)}</span><span className="mut">{it.next}</span></td>
+       <td><div className="wk"><Av name={it.worker} sm ai/>{it.worker}</div></td>
+      </tr>)}
+      <tr className="add"><td className="strip" style={{background:g.c,opacity:.5}}/><td colSpan={8}><span style={{display:"inline-flex",alignItems:"center",gap:6}}><I d={P.plus} s={14}/>Add item</span></td></tr>
+      <tr className="foot"><td/><td/><td/><td/>
+       <td style={{padding:"6px 0"}}><div className="dist">{STATUSES.map(s=>{const n=rows.filter(r=>r.status===s).length;return n?<i key={s} title={s+" "+n} style={{flex:n,background:ST[s]}}/>:null})}</div></td>
+       <td><span className="mut" style={{fontSize:12}}>avg </span><b style={{fontFamily:"JetBrains Mono",fontWeight:500}}>{avg}</b></td><td/><td/><td/></tr>
+     </tbody></table>}
+   </div>})}
+ </div>;
+}
+
+function Kanban({items,setItems,onOpen}){
+ const [over,setOver]=useState(null);
+ return <div className="kan">{STATUSES.map(s=>{const rows=items.filter(i=>i.status===s);
+  return <div key={s} className={"col"+(over===s?" over":"")} onDragOver={e=>{e.preventDefault();setOver(s)}} onDragLeave={()=>setOver(null)}
+    onDrop={e=>{const id=+e.dataTransfer.getData("id");setItems(items.map(x=>x.id===id?{...x,status:s}:x));setOver(null)}}>
+   <div className="colh"><span className="dot" style={{background:ST[s]}}/>{s}<span className="mut" style={{fontWeight:400}}>{rows.length}</span><span className="sp"/><I d={P.plus} s={14} c="#828282"/></div>
+   {rows.map(it=><div key={it.id} className="card" draggable onDragStart={e=>e.dataTransfer.setData("id",it.id)} onClick={()=>onOpen(it)}>
+     <Co it={it}/>
+     <div className="row"><Trade t={it.trade}/><span className="mut" style={{fontSize:12}}>{it.rev}</span></div>
+     <div className="row" style={{marginTop:10}}><div style={{flex:1}}><Bar v={it.intent}/></div></div>
+     <div className="row" style={{marginTop:10,justifyContent:"space-between"}}><span className="mut" style={{fontSize:12}}><span style={{color:"#cfcfcf"}}>{nd(it.day)}</span> · {it.next}</span><Av name={it.worker} sm ai/></div>
+   </div>)}
+   <div className="mut" style={{display:"flex",alignItems:"center",gap:6,padding:"4px 6px"}}><I d={P.plus} s={14}/>Add item</div>
+  </div>})}</div>;
+}
+
+function Calendar({items,onOpen}){
+ const cells=[];for(let i=0;i<35;i++){cells.push(i+1)}
+ return <div className="cal">
+  <div className="calh"><button className="btn"><I d={P.chevl} s={14}/></button><button className="btn"><I d={P.chevr} s={14}/></button><h2>November 2026</h2><button className="btn ghost">Today</button><span className="sp"/>
+   <span className="mut">Date field: Next step</span><div className="seg"><button className="on">Month</button><button>Week</button></div></div>
+  <div className="month">
+   {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=><div className="dow" key={d}>{d}</div>)}
+   {cells.map(d=>{const out=d>30;const dd=out?d-30:d;const its=items.filter(i=>i.day===d);
+    return <div key={d} className={"day"+(out?" out":"")+(d===15?" today":"")}>
+     <div className="dn">{dd}</div>
+     {its.slice(0,3).map(it=><div key={it.id} className="chip" style={{borderLeftColor:ST[it.status]}} onClick={()=>onOpen(it)}>{it.company}</div>)}
+     {its.length>3&&<div className="mut" style={{fontSize:11.5,paddingLeft:6}}>+{its.length-3} more</div>}
+    </div>})}
+  </div></div>;
+}
+
+function Timeline({items,onOpen}){
+ const start=2,days=49; // Nov 2 to Dec 20
+ const weeks=[];for(let i=0;i<7;i++){const d=start+i*7;weeks.push(nd(d))}
+ const pct=d=>((d-start)/days*100);
+ return <div className="tl"><div className="tlg">
+  <div className="tln" style={{background:"#1b1b1b",fontWeight:500,color:"#828282"}}>Item</div>
+  <div className="tlr" style={{display:"flex",background:"#1b1b1b"}}>{weeks.map(w=><div key={w} style={{flex:1,borderLeft:"1px solid #2c2c2c",padding:"9px 8px",color:"#828282",fontSize:12}}>Week of {w}</div>)}</div>
+  {items.map(it=>{const s=Math.max(start,it.day-6-(it.id%4)*2);const e=it.day+4+(it.id%3)*5;
+   return <React.Fragment key={it.id}>
+    <div className="tln"><Co it={it} onOpen={onOpen}/></div>
+    <div className="tlr">
+     {weeks.map((w,i)=><i key={i} style={{position:"absolute",top:0,bottom:0,left:(i/7*100)+"%",borderLeft:"1px solid #1f1f1f"}}/>)}
+     <i style={{position:"absolute",top:0,bottom:0,left:pct(15)+"%",borderLeft:"2px solid #5b78ff"}}/>
+     <div className="tlb" style={{left:pct(s)+"%",width:(pct(e)-pct(s))+"%",background:ST[it.status]}}>{it.next}</div>
+    </div></React.Fragment>})}
+ </div></div>;
+}
+
+function Form(){
+ const F=({l,ph,sel})=><div style={{marginBottom:16}}><label className="fl">{l}</label>{sel?<div className="fi" style={{display:"flex",alignItems:"center",justifyContent:"space-between",color:"#828282"}}>{ph}<I d={P.chev} s={14}/></div>:<input className="fi" placeholder={ph}/>}</div>;
+ return <div style={{padding:"0 24px"}}>
+  <div style={{maxWidth:620,margin:"20px auto 0",display:"flex",alignItems:"center",gap:10}}>
+   <div className="fi" style={{display:"flex",alignItems:"center",gap:8,flex:1,color:"#8a9dff"}}><I d={P.link} s={14}/>ai.hiublue.com/f/rolp/blue-collar-prospects</div>
+   <button className="btn">Copy link</button><span className="mut">Accept responses</span><span className="toggle"/>
+  </div>
+  <div className="form">
+   <div className="fh"><div style={{fontSize:18,fontWeight:600}}>Add a prospect</div><div className="mut" style={{marginTop:4}}>Submissions land in Blue Collar Prospects, group Nurturing. Ashley scores intent within a minute.</div></div>
+   <div style={{padding:"22px 26px"}}>
+    <F l="Company" ph="Bayou City Roofing"/>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}><F l="Trade" ph="Choose a trade" sel/><F l="Revenue band" ph="Choose a band" sel/></div>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}><F l="Owner name" ph="First and last name"/><F l="Owner phone" ph="(713) 555 0100"/></div>
+    <F l="Next step" ph="What should happen next"/>
+    <div style={{display:"flex",justifyContent:"flex-end",gap:8,marginTop:6}}><button className="btn">Preview</button><button className="btn pri">Submit</button></div>
+   </div></div></div>;
+}
+
+/* charts */
+function BarChart({items}){
+ const tr=Object.keys(TRADE_C).map(t=>[t,items.filter(i=>i.trade===t).length]).sort((a,b)=>b[1]-a[1]);
+ const W=520,H=220,L=96,max=4;
+ return <svg width="100%" viewBox={`0 0 ${W} ${H}`}>
+  {[0,1,2,3,4].map(v=><g key={v}><line x1={L+v*(W-L-20)/max} x2={L+v*(W-L-20)/max} y1={4} y2={H-22} stroke="#242424"/><text x={L+v*(W-L-20)/max} y={H-6} fill="#828282" fontSize="11" textAnchor="middle">{v}</text></g>)}
+  {tr.map(([t,n],i)=><g key={t}><text x={L-10} y={20+i*27} fill="#cfcfcf" fontSize="12" textAnchor="end" dominantBaseline="middle">{t}</text>
+   <rect x={L} y={11+i*27} width={n*(W-L-20)/max} height={18} rx={3} fill="#5b78ff"/>
+   <text x={L+n*(W-L-20)/max+6} y={20+i*27} fill="#e6e6e6" fontSize="11.5" dominantBaseline="middle">{n}</text></g>)}
+ </svg>;
+}
+function Donut({items}){
+ const tot=items.length;let a=-Math.PI/2;const R=70,r=46,cx=90,cy=90;
+ const seg=STATUSES.map(s=>{const n=items.filter(i=>i.status===s).length;const a0=a;a+=n/tot*2*Math.PI;return [s,n,a0,a]}).filter(x=>x[1]);
+ const arc=(a0,a1)=>{const g=0.02;a0+=g;a1-=g;const L=a1-a0>Math.PI?1:0;const p=(rr,an)=>[cx+rr*Math.cos(an),cy+rr*Math.sin(an)];const [x0,y0]=p(R,a0),[x1,y1]=p(R,a1),[x2,y2]=p(r,a1),[x3,y3]=p(r,a0);return `M${x0} ${y0}A${R} ${R} 0 ${L} 1 ${x1} ${y1}L${x2} ${y2}A${r} ${r} 0 ${L} 0 ${x3} ${y3}Z`};
+ return <div style={{display:"flex",alignItems:"center",gap:18}}><svg width="180" height="180">{seg.map(([s,n,a0,a1])=><path key={s} d={arc(a0,a1)} fill={ST[s]}/>)}
+  <text x={cx} y={cy-4} textAnchor="middle" fill="#e6e6e6" fontSize="22" fontWeight="600">{tot}</text><text x={cx} y={cy+15} textAnchor="middle" fill="#828282" fontSize="11">prospects</text></svg>
+  <div style={{display:"grid",gap:7}}>{seg.map(([s,n])=><div key={s} style={{display:"flex",alignItems:"center",gap:8}}><span className="dot" style={{background:ST[s]}}/><span style={{width:96}}>{s}</span><b style={{fontWeight:500}}>{n}</b></div>)}</div></div>;
+}
+function Line(){
+ const d=[3,5,4,7,6,9,8,12],lab=["Sep 27","Oct 4","Oct 11","Oct 18","Oct 25","Nov 1","Nov 8","Nov 15"];
+ const W=520,H=210,L=30,B=26,T=10,mx=12;const x=i=>L+i*(W-L-30)/7,y=v=>T+(H-T-B)*(1-v/mx);
+ const pts=d.map((v,i)=>x(i)+","+y(v)).join(" ");
+ return <svg width="100%" viewBox={`0 0 ${W} ${H}`}>
+  {[0,4,8,12].map(v=><g key={v}><line x1={L} x2={W-8} y1={y(v)} y2={y(v)} stroke="#242424"/><text x={L-8} y={y(v)} fill="#828282" fontSize="11" textAnchor="end" dominantBaseline="middle">{v}</text></g>)}
+  <polygon points={`${x(0)},${y(0)} ${pts} ${x(7)},${y(0)}`} fill="rgba(91,120,255,.12)"/>
+  <polyline points={pts} fill="none" stroke="#5b78ff" strokeWidth="2.2"/>
+  {d.map((v,i)=><circle key={i} cx={x(i)} cy={y(v)} r={3.2} fill="#161616" stroke="#5b78ff" strokeWidth="2"/>)}
+  {lab.map((l,i)=><text key={l} x={x(i)} y={H-6} fill="#828282" fontSize="11" textAnchor="middle">{l}</text>)}
+ </svg>;
+}
+function Funnel(){
+ const st=[["Lead",16,"#525252"],["Contacted",11,"#5b78ff"],["Meeting set",6,"#a855f7"],["Proposal sent",4,"#d4a20a"],["Won",2,"#22c55e"]];
+ return <div style={{display:"grid",gap:7}}>{st.map(([s,n,c])=><div key={s} style={{display:"flex",alignItems:"center",gap:10}}>
+  <span style={{width:92,color:"#cfcfcf"}}>{s}</span>
+  <div style={{flex:1,display:"flex",justifyContent:"center"}}><div style={{width:(n/16*100)+"%",height:26,background:c,borderRadius:4,display:"grid",placeItems:"center",color:"#fff",fontWeight:600,fontSize:12}}>{n}</div></div>
+  <span className="mut" style={{width:40,textAlign:"right",fontSize:12}}>{Math.round(n/16*100)}%</span></div>)}</div>;
+}
+function Dashboard({items}){
+ const top=[...items].sort((a,b)=>b.intent-a.intent).filter(i=>i.status!=="Won").slice(0,5);
+ const Tile=({l,v,d,sub})=><div className="w" style={{gridColumn:"span 3"}}><div className="mut">{l}</div><div className="num">{v}</div><div style={{fontSize:12}}><span className="delta">{d}</span> <span className="mut">{sub}</span></div></div>;
+ return <div className="dash">
+  <Tile l="Total prospects" v={items.length} d="+4" sub="vs last week"/>
+  <Tile l="Meetings set" v={items.filter(i=>i.status==="Meeting set").length} d="+2" sub="this week"/>
+  <Tile l="Pipeline value" v="$4.2M" d="+18%" sub="vs last month"/>
+  <Tile l="Avg intent score" v={Math.round(items.reduce((a,b)=>a+b.intent,0)/items.length)} d="+6" sub="vs last week"/>
+  <div className="w" style={{gridColumn:"span 6"}}><h3>Prospects by trade <span className="mut">Count</span></h3><BarChart items={items}/></div>
+  <div className="w" style={{gridColumn:"span 6"}}><h3>Status breakdown</h3><Donut items={items}/></div>
+  <div className="w" style={{gridColumn:"span 6"}}><h3>New prospects per week <span className="mut">Last 8 weeks</span></h3><Line/></div>
+  <div className="w" style={{gridColumn:"span 6"}}><h3>Lead to Won</h3><Funnel/></div>
+  <div className="w" style={{gridColumn:"span 12"}}><h3>Top intent this week</h3>
+   <table><colgroup><col style={{width:"30%"}}/><col/><col/><col style={{width:"22%"}}/><col/></colgroup>
+    <thead><tr>{["Company","Trade","Status","Intent score","Assigned worker"].map(h=><th key={h} style={{borderRight:0,background:"transparent",borderTop:0}}>{h}</th>)}</tr></thead>
+    <tbody>{top.map(it=><tr key={it.id}><td style={{background:"transparent",borderRight:0}}><Co it={it}/></td><td style={{background:"transparent",borderRight:0}}><Trade t={it.trade}/></td>
+     <td style={{background:"transparent",borderRight:0}}><span className="tag" style={{background:ST[it.status],border:0,color:"#fff"}}>{it.status}</span></td>
+     <td style={{background:"transparent",borderRight:0}}><Bar v={it.intent}/></td><td style={{background:"transparent",borderRight:0}}><div className="wk"><Av name={it.worker} sm ai/>{it.worker}</div></td></tr>)}</tbody></table></div>
+ </div>;
+}
+
+function AIPanel({onClose}){
+ const steps=["Created board Blue Collar Prospects","Added 8 columns: Company, Trade, Owner, Status, Intent score, Revenue band, Next step, Assigned worker","Imported 16 prospects from Contacts","Split them into 3 groups by stage","Added Kanban view grouped by Status","Built a dashboard with 6 widgets"];
+ return <div className="panel">
+  <div className="ph"><Av name="Ashley" ai/><div><div style={{fontWeight:600}}>Ashley</div><div className="mut" style={{fontSize:12}}>AI worker · Boards</div></div><span className="sp"/><button className="x"><I d={P.more} s={16}/></button><button className="x" onClick={onClose}><I d={P.x} s={16}/></button></div>
+  <div className="pb">
+   <div className="msgu">Build me a board to track my blue collar prospects with trade, owner, status, intent score, revenue band and next step. Add a kanban by status and a dashboard.</div>
+   <div style={{display:"flex",gap:10}}><Av name="Ashley" sm ai/><div style={{flex:1}}>
+    <div style={{marginBottom:10}}>Done. I built it from the prospects already in your Contacts, so nothing was typed in by hand.</div>
+    <div style={{border:"1px solid #2c2c2c",borderRadius:8,padding:"4px 12px",background:"#1b1b1b"}}>
+     {steps.map(s=><div className="step" key={s} style={s===steps[steps.length-1]?{borderBottom:0}:null}><span className="ok"><I d={P.check} s={11}/></span><span>{s}</span></div>)}
+    </div>
+    <div style={{border:"1px solid #2c2c2c",borderRadius:8,marginTop:12,overflow:"hidden"}}>
+     <div style={{padding:"9px 12px",display:"flex",alignItems:"center",gap:8,borderBottom:"1px solid #2c2c2c",background:"#1b1b1b"}}><I d={P.board} s={14} c="#8a9dff"/><b style={{fontWeight:600}}>Blue Collar Prospects</b><span className="mut" style={{marginLeft:"auto",fontSize:12}}>16 items</span></div>
+     {ITEMS0.slice(0,4).map(it=><div key={it.id} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 12px",borderBottom:"1px solid #1f1f1f",fontSize:12}}><span style={{flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{it.company}</span><span style={{background:ST[it.status],color:"#fff",borderRadius:4,padding:"1px 7px",fontSize:11}}>{it.status}</span><span style={{width:22,textAlign:"right",fontFamily:"JetBrains Mono"}}>{it.intent}</span></div>)}
+    </div>
+    <div style={{display:"flex",gap:8,marginTop:12}}><button className="btn pri">Open board</button><button className="btn"><I d={P.undo} s={14}/>Undo</button></div>
+    <div className="mut" style={{fontSize:12,marginTop:12}}>Want me to text each Hot this week owner and log replies on the board?</div>
+   </div></div>
+  </div>
+  <div className="composer"><span style={{flex:1}}>Ask Ashley to change this board</span><span style={{width:28,height:28,borderRadius:8,background:"#3550e8",display:"grid",placeItems:"center"}}><I d={P.arrowup} s={15} c="#fff"/></span></div>
+ </div>;
+}
+
+function Drawer({it,onClose}){
+ return <div className="panel" style={{width:420}}>
+  <div className="ph"><Co it={it}/><span className="sp"/><button className="x" onClick={onClose}><I d={P.x} s={16}/></button></div>
+  <div className="pb">
+   <div className="kv">
+    <span className="k">Status</span><span><span className="tag" style={{background:ST[it.status],border:0,color:"#fff"}}>{it.status}</span></span>
+    <span className="k">Trade</span><span><Trade t={it.trade}/></span>
+    <span className="k">Owner</span><span>{it.owner}</span>
+    <span className="k">Intent score</span><Bar v={it.intent}/>
+    <span className="k">Revenue band</span><span>{it.rev}</span>
+    <span className="k">Next step</span><span>{nd(it.day)} · {it.next}</span>
+    <span className="k">Assigned worker</span><div className="wk"><Av name={it.worker} sm ai/>{it.worker}</div>
+    <span className="k">Contact</span><span style={{color:"#8a9dff"}}>{it.owner} in Contacts</span>
+   </div>
+   <div style={{fontWeight:600,marginTop:24}}>Updates</div>
+   <div className="upd"><div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}><Av name="Ashley" sm ai/><b style={{fontWeight:500}}>Ashley</b><span className="mut" style={{fontSize:12}}>2 hours ago</span></div>{it.owner.split(" ")[0]} replied to the text and asked for a call next week. I moved the status and set the next step.</div>
+   <div className="upd"><div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}><span className="av sm" style={{background:"#334155"}}>RO</span><b style={{fontWeight:500}}>Ralph Oliver</b><span className="mut" style={{fontSize:12}}>Yesterday</span></div>Good fit. Lead with the iMessage numbers when we talk.</div>
+   <div className="composer" style={{margin:"14px 0 0",minHeight:52}}><span style={{flex:1}}>Write an update</span></div>
+  </div>
+ </div>;
+}
+
+const VIEWS=[["grid","Grid","grid"],["kanban","Kanban","kan"],["calendar","Calendar","cal"],["timeline","Timeline","tl"],["form","Form","form"],["dashboard","Dashboard","chart"]];
+function App(){
+ const h=location.hash.slice(1).split("-");
+ const [view,setView]=useState(VIEWS.some(v=>v[0]===h[0])?h[0]:"grid");
+ const [ai,setAi]=useState(h.includes("ai"));
+ const [open,setOpen]=useState(h.includes("item")?ITEMS0[0]:null);
+ const [items,setItems]=useState(ITEMS0);
+ useEffect(()=>{history.replaceState(null,"","#"+view+(ai?"-ai":""))},[view,ai]);
+ const openItem=it=>{setAi(false);setOpen(it)};
+ return <div className="app"><Sidebar/>
+  <main className="main">
+   <div className="head">
+    <div className="crumb">Boards <span style={{margin:"0 4px"}}>/</span> <span style={{color:"#cfcfcf"}}>Blue Collar Prospects</span></div>
+    <div className="titlerow"><div><h1>Blue Collar Prospects <I d={P.star} s={16} c="#eab308"/></h1><div className="desc">Owner prospects for hiublue growth partner outreach</div></div><span className="sp"/>
+     <div className="avs" style={{marginTop:2}}><span className="av" style={{background:"#334155"}}>RO</span><Av name="Ashley" ai/><Av name="Yoli" ai/><Av name="Marco" ai/></div>
+     <button className="btn"><I d={P.share} s={14}/>Share</button>
+     <button className="btn ai" onClick={()=>{setOpen(null);setAi(!ai)}}><I d={P.spark} s={14}/>Ask Ashley</button></div>
+    <div className="tabs">{VIEWS.map(([k,l,ic])=><button key={k} className={"tab"+(view===k?" on":"")} onClick={()=>setView(k)}><I d={P[ic]} s={14}/>{l}</button>)}
+     <button className="tab"><I d={P.plus} s={14}/>View</button></div>
+   </div>
+   <div className="tools"><div className="search"><I d={P.search} s={14}/>Search this board</div>
+    <button className="btn ghost"><I d={P.filter} s={14}/>Filter</button><button className="btn ghost"><I d={P.sort} s={14}/>Sort</button>
+    <button className="btn ghost"><I d={P.layers} s={14}/>Group by: Status</button><button className="btn ghost"><I d={P.eye} s={14}/>Hide fields</button>
+    <span className="sp"/>{view==="dashboard"?<><button className="btn">Edit layout</button><button className="btn pri"><I d={P.plus} s={14}/>Add widget</button></>:<button className="btn pri"><I d={P.plus} s={14}/>New item</button>}</div>
+   <div className="body">
+    {view==="grid"&&<Grid items={items} setItems={setItems} onOpen={openItem}/>}
+    {view==="kanban"&&<Kanban items={items} setItems={setItems} onOpen={openItem}/>}
+    {view==="calendar"&&<Calendar items={items} onOpen={openItem}/>}
+    {view==="timeline"&&<Timeline items={items} onOpen={openItem}/>}
+    {view==="form"&&<Form/>}
+    {view==="dashboard"&&<Dashboard items={items}/>}
+   </div>
+  </main>
+  {ai&&<div style={{position:"fixed",top:0,right:0,bottom:0,width:380,zIndex:50}}><AIPanel onClose={()=>setAi(false)}/></div>}
+  {open&&<div style={{position:"fixed",top:0,right:0,bottom:0,width:420,zIndex:50}}><Drawer it={open} onClose={()=>setOpen(null)}/></div>}
+ </div>;
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
